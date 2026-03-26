@@ -22,7 +22,8 @@ export function loadConfigFile(): Partial<ConfigFile> {
 export function loadConfig(flags: GlobalFlags): Config {
   const file = loadConfigFile();
 
-  const apiKey = flags.apiKey || process.env.MINIMAX_API_KEY || undefined;
+  const apiKey = flags.apiKey || undefined;
+  const envApiKey = process.env.MINIMAX_API_KEY || undefined;
   const fileApiKey = file.api_key;
 
   const explicitRegion = (flags.region as string)
@@ -57,6 +58,7 @@ export function loadConfig(flags: GlobalFlags): Config {
 
   return {
     apiKey,
+    envApiKey,
     fileApiKey,
     region,
     baseUrl,

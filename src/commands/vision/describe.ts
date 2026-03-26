@@ -66,6 +66,10 @@ export default defineCommand({
   name: 'vision describe',
   description: 'Describe an image using MiniMax VLM',
   usage: 'minimax vision describe --image <path-or-url> [--prompt <text>]',
+  options: [
+    { flag: '--image <path-or-url>', description: 'Image file path or URL' },
+    { flag: '--prompt <text>', description: 'Question about the image (default: "Describe the image.")' },
+  ],
   examples: [
     'minimax vision describe --image photo.jpg',
     'minimax vision describe --image https://example.com/photo.jpg --prompt "What breed is this dog?"',

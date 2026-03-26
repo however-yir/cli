@@ -18,6 +18,11 @@ export default defineCommand({
   name: 'auth login',
   description: 'Authenticate via OAuth or API key',
   usage: 'minimax auth login [--method oauth|api-key] [--api-key <key>] [--no-browser]',
+  options: [
+    { flag: '--method <method>', description: 'Auth method: oauth (default), api-key' },
+    { flag: '--api-key <key>', description: 'API key to store' },
+    { flag: '--no-browser', description: 'Use device-code flow instead of browser' },
+  ],
   examples: [
     'minimax auth login',
     'minimax auth login --no-browser',

@@ -69,7 +69,32 @@ minimax vision describe --image photo.jpg --prompt "What is this?"
 
 ## Commands
 
-### text
+Run `minimax <command> --help` to see the full list of options, defaults, and usage examples for any command.
+
+| Command | Description | Command-specific flags |
+|---|---|---|
+| `auth login` | Authenticate via OAuth or API key | `--method`, `--api-key`, `--no-browser` |
+| `auth status` | Show current authentication state | — |
+| `auth refresh` | Manually refresh OAuth token | — |
+| `auth logout` | Revoke tokens and clear stored credentials | — |
+| `text chat` | Send a chat completion | `--model`, `--message`, `--messages-file`, `--system`, `--max-tokens`, `--temperature`, `--top-p`, `--stream`, `--tool` |
+| `speech synthesize` | Synchronous TTS, up to 10k chars | `--model`, `--text`, `--text-file`, `--voice`, `--speed`, `--volume`, `--pitch`, `--format`, `--sample-rate`, `--bitrate`, `--channels`, `--language`, `--subtitles`, `--pronunciation`, `--sound-effect`, `--out`, `--out-format`, `--stream` |
+| `image generate` | Generate images | `--prompt`, `--aspect-ratio`, `--n`, `--subject-ref`, `--out-dir`, `--out-prefix` |
+| `video generate` | Create a video generation task | `--model`, `--prompt`, `--first-frame`, `--callback-url`, `--wait`, `--poll-interval`, `--download` |
+| `video task get` | Query video task status | `--task-id` |
+| `video download` | Download a completed video by file ID | `--file-id`, `--out` |
+| `music generate` | Generate a song | `--prompt`, `--lyrics`, `--lyrics-file`, `--auto-lyrics`, `--format`, `--sample-rate`, `--bitrate`, `--stream`, `--out`, `--out-format` |
+| `search query` | Search the web via MiniMax | `--q` |
+| `vision describe` | Describe an image using MiniMax VLM | `--image`, `--prompt` |
+| `quota show` | Display Token Plan usage and remaining quotas | — |
+| `config show` | Show current configuration | — |
+| `config set` | Set a config value | `--key`, `--value` |
+
+All commands also accept [global flags](#global-flags) (`--api-key`, `--output`, `--quiet`, `--verbose`, etc.).
+
+### Examples
+
+#### text
 
 ```bash
 # Simple chat
@@ -87,7 +112,7 @@ minimax text chat --message "user:Tell me a story" --stream
 cat conversation.json | minimax text chat --messages-file -
 ```
 
-### speech
+#### speech
 
 ```bash
 # Generate speech and save to file
@@ -103,7 +128,7 @@ minimax speech synthesize --text "Stream this" --stream | mpv --no-terminal -
 minimax speech synthesize --text "Fast narration" --voice English_expressive_narrator --speed 1.5 --out fast.mp3
 ```
 
-### image
+#### image
 
 ```bash
 # Generate an image
@@ -116,7 +141,7 @@ minimax image generate --prompt "Logo design" --aspect-ratio 1:1 --n 3 --out-dir
 minimax image generate --prompt "Portrait in oil painting style" --subject-ref ./photo.jpg
 ```
 
-### video
+#### video
 
 ```bash
 # Submit a video generation task
@@ -135,7 +160,7 @@ minimax video task get --task-id 106916112212032
 minimax video download --file-id 176844028768320 --out video.mp4
 ```
 
-### music
+#### music
 
 ```bash
 # Generate with custom lyrics
@@ -148,7 +173,7 @@ minimax music generate --prompt "Upbeat pop" --lyrics-file song.txt --out summer
 minimax music generate --prompt "Jazz lounge" --auto-lyrics --out jazz.mp3
 ```
 
-### search
+#### search
 
 ```bash
 # Web search
@@ -158,7 +183,7 @@ minimax search query --q "MiniMax AI"
 minimax search query --q "latest news" --output json
 ```
 
-### vision
+#### vision
 
 ```bash
 # Describe a local image
@@ -171,7 +196,7 @@ minimax vision describe --image https://example.com/photo.jpg
 minimax vision describe --image screenshot.png --prompt "Extract the text from this screenshot"
 ```
 
-### quota
+#### quota
 
 ```bash
 # Show usage and remaining quotas
@@ -181,7 +206,7 @@ minimax quota show
 minimax quota show --output json
 ```
 
-### config
+#### config
 
 ```bash
 # Show current configuration
@@ -197,7 +222,7 @@ minimax config set --key output --value json
 minimax config set --key timeout --value 600
 ```
 
-### auth
+#### auth
 
 ```bash
 # Login with API key

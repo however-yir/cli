@@ -148,7 +148,9 @@ Global Flags:
   --version              Print version and exit
   --help                 Show help
 
-Run 'minimax <resource> <command> --help' for command-specific help.
+Getting Help:
+  Add --help after any command to see its full list of options, defaults,
+  and usage examples. For example: minimax text chat --help
 `);
   }
 
@@ -157,6 +159,14 @@ Run 'minimax <resource> <command> --help' for command-specific help.
     if (cmd.usage) {
       console.log(`Usage: ${cmd.usage}\n`);
     }
+    if (cmd.options && cmd.options.length > 0) {
+      const maxLen = Math.max(...cmd.options.map(o => o.flag.length));
+      console.log('Options:');
+      for (const opt of cmd.options) {
+        console.log(`  ${opt.flag.padEnd(maxLen + 2)} ${opt.description}`);
+      }
+      console.log('');
+    }
     if (cmd.examples && cmd.examples.length > 0) {
       console.log('Examples:');
       for (const ex of cmd.examples) {
@@ -164,6 +174,8 @@ Run 'minimax <resource> <command> --help' for command-specific help.
       }
       console.log('');
     }
+    console.log(`Global flags (--api-key, --output, --quiet, etc.) are always available.`);
+    console.log(`Run 'minimax --help' for the full list.\n`);
   }
 
   private printChildren(node: CommandNode, prefix: string): void {

@@ -15,6 +15,15 @@ export default defineCommand({
   name: 'video generate',
   description: 'Create a video generation task (Hailuo-2.3 / 2.3-Fast)',
   usage: 'minimax video generate --prompt <text> [flags]',
+  options: [
+    { flag: '--model <model>', description: 'Model ID (default: MiniMax-Hailuo-2.3)' },
+    { flag: '--prompt <text>', description: 'Video description' },
+    { flag: '--first-frame <path-or-url>', description: 'First frame image' },
+    { flag: '--callback-url <url>', description: 'Webhook URL for completion notification' },
+    { flag: '--wait', description: 'Poll until task completes' },
+    { flag: '--poll-interval <seconds>', description: 'Polling interval (default: 10)' },
+    { flag: '--download <path>', description: 'Download video on completion' },
+  ],
   examples: [
     'minimax video generate --prompt "A man reads a book. Static shot."',
     'minimax video generate --prompt "Mouse runs toward camera." --first-frame ./mouse.jpg --model MiniMax-Hailuo-2.3-Fast',

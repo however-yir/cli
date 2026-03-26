@@ -57,6 +57,17 @@ export default defineCommand({
   name: 'text chat',
   description: 'Send a chat completion (M2.7 / M2.7-highspeed)',
   usage: 'minimax text chat --message <role:content> [flags]',
+  options: [
+    { flag: '--model <model>', description: 'Model ID (default: MiniMax-M2.7)' },
+    { flag: '--message <role:content>', description: 'Message in role:content format (repeatable)' },
+    { flag: '--messages-file <path>', description: 'JSON file with messages array (use - for stdin)' },
+    { flag: '--system <text>', description: 'System prompt' },
+    { flag: '--max-tokens <n>', description: 'Maximum tokens to generate' },
+    { flag: '--temperature <n>', description: 'Sampling temperature' },
+    { flag: '--top-p <n>', description: 'Nucleus sampling threshold' },
+    { flag: '--stream', description: 'Stream response tokens (default: on in TTY)' },
+    { flag: '--tool <json-or-path>', description: 'Tool definition as JSON or file path (repeatable)' },
+  ],
   examples: [
     'minimax text chat --message "user:What is MiniMax?"',
     'minimax text chat --model MiniMax-M2.7-highspeed --system "You are a coding assistant." --message "user:Write fizzbuzz in Python"',

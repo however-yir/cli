@@ -12,6 +12,9 @@ export default defineCommand({
   name: 'video task get',
   description: 'Query video task status',
   usage: 'minimax video task get --task-id <id>',
+  options: [
+    { flag: '--task-id <id>', description: 'Video generation task ID' },
+  ],
   examples: [
     'minimax video task get --task-id 106916112212032',
     'minimax video task get --task-id 106916112212032 --output json',

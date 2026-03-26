@@ -19,6 +19,7 @@ export type ConfigFile = z.infer<typeof ConfigSchema>;
 
 export interface Config {
   apiKey?: string;
+  envApiKey?: string;
   fileApiKey?: string;
   region: Region;
   baseUrl: string;

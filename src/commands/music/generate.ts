@@ -13,6 +13,18 @@ export default defineCommand({
   name: 'music generate',
   description: 'Generate a song (music-2.5)',
   usage: 'minimax music generate --prompt <text> [--lyrics <text>] [--out <path>] [flags]',
+  options: [
+    { flag: '--prompt <text>', description: 'Music style description' },
+    { flag: '--lyrics <text>', description: 'Song lyrics' },
+    { flag: '--lyrics-file <path>', description: 'Read lyrics from file (use - for stdin)' },
+    { flag: '--auto-lyrics', description: 'Auto-generate lyrics from prompt' },
+    { flag: '--format <fmt>', description: 'Audio format (default: mp3)' },
+    { flag: '--sample-rate <hz>', description: 'Sample rate (default: 44100)' },
+    { flag: '--bitrate <bps>', description: 'Bitrate (default: 256000)' },
+    { flag: '--stream', description: 'Stream raw audio to stdout' },
+    { flag: '--out <path>', description: 'Output file path' },
+    { flag: '--out-format <fmt>', description: 'Output format: hex (default), url' },
+  ],
   examples: [
     'minimax music generate --prompt "Indie folk, melancholic" --lyrics-file song.txt --out my_song.mp3',
     'minimax music generate --prompt "Upbeat pop" --auto-lyrics --out summer.mp3',

@@ -14,6 +14,10 @@ export default defineCommand({
   name: 'config set',
   description: 'Set a config value',
   usage: 'minimax config set --key <key> --value <value>',
+  options: [
+    { flag: '--key <key>', description: 'Config key (region, base_url, output, timeout, api_key)' },
+    { flag: '--value <value>', description: 'Value to set' },
+  ],
   examples: [
     'minimax config set --key output --value json',
     'minimax config set --key timeout --value 600',

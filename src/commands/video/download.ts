@@ -13,6 +13,10 @@ export default defineCommand({
   name: 'video download',
   description: 'Download a completed video by file ID',
   usage: 'minimax video download --file-id <id> --out <path>',
+  options: [
+    { flag: '--file-id <id>', description: 'File ID to download' },
+    { flag: '--out <path>', description: 'Output file path' },
+  ],
   examples: [
     'minimax video download --file-id 176844028768320 --out video.mp4',
     'minimax video download --file-id 176844028768320 --out video.mp4 --quiet',

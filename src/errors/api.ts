@@ -13,6 +13,21 @@ export interface ApiErrorBody {
   };
 }
 
+function planHintForUrl(url?: string): string {
+  if (!url) return '';
+  if (url.includes('/t2a'))              return '\n\nSpeech models require the Plus plan or above.';
+  if (url.includes('/image_generation')) return '\n\nimage-01 requires the Plus plan or above.';
+  if (url.includes('/video_generation') || url.includes('/query/video_generation'))
+                                         return '\n\nVideo models (Hailuo-2.3 / 2.3-Fast) require the Max plan or above.';
+  if (url.includes('/music_generation')) return '\n\nMusic-2.5 requires the Max plan or above.';
+  return '';
+}
+
+function upgradeUrl(url?: string): string {
+  const host = url?.includes('minimaxi.com') ? 'https://platform.minimaxi.com' : 'https://platform.minimax.io';
+  return `${host}/subscribe/token-plan`;
+}
+
 export function mapApiError(status: number, body: ApiErrorBody, url?: string): CLIError {
   const apiMsg =
     body.base_resp?.status_msg ||
@@ -56,19 +71,21 @@ export function mapApiError(status: number, body: ApiErrorBody, url?: string): C
 
   // MiniMax insufficient quota
   if (apiCode === 1028 || apiCode === 1030) {
+    const hint = planHintForUrl(url);
     return new CLIError(
       `Quota exhausted. ${apiMsg}`,
       ExitCode.QUOTA,
-      'Check usage: minimax quota show\nUpgrade plan: https://platform.minimax.io/subscribe/token-plan',
+      `Check usage: minimax quota show${hint}\nUpgrade plan: ${upgradeUrl(url)}`,
     );
   }
 
   // MiniMax model not supported by plan
   if (apiCode === 2061) {
+    const hint = planHintForUrl(url);
     return new CLIError(
-      `${apiMsg}`,
+      `This model is not available on your current Token Plan. ${apiMsg}`,
       ExitCode.QUOTA,
-      'This model is not available on your current Token Plan.\nCheck usage: minimax quota show',
+      `Check usage: minimax quota show${hint}\nUpgrade plan: ${upgradeUrl(url)}`,
     );
   }
 

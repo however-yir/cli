@@ -6,10 +6,9 @@ import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
 
 export async function resolveCredential(config: Config): Promise<ResolvedCredential> {
-  // 1. --api-key flag (passed through config.apiKey which includes flag + env precedence)
+  // 1. --api-key flag
   if (config.apiKey) {
-    const source = process.env.MINIMAX_API_KEY === config.apiKey ? 'env' : 'flag';
-    return { token: config.apiKey, method: 'api-key', source };
+    return { token: config.apiKey, method: 'api-key', source: 'flag' };
   }
 
   // 2. OAuth credentials file
@@ -22,6 +21,11 @@ export async function resolveCredential(config: Config): Promise<ResolvedCredent
   // 3. API key from config file
   if (config.fileApiKey) {
     return { token: config.fileApiKey, method: 'api-key', source: 'config.yaml' };
+  }
+
+  // 4. Environment variable
+  if (config.envApiKey) {
+    return { token: config.envApiKey, method: 'api-key', source: 'env' };
   }
 
   throw new CLIError(

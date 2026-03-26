@@ -15,6 +15,14 @@ export default defineCommand({
   name: 'image generate',
   description: 'Generate images (image-01)',
   usage: 'minimax image generate --prompt <text> [flags]',
+  options: [
+    { flag: '--prompt <text>', description: 'Image description' },
+    { flag: '--aspect-ratio <ratio>', description: 'Aspect ratio (e.g. 16:9, 1:1)' },
+    { flag: '--n <count>', description: 'Number of images to generate (default: 1)' },
+    { flag: '--subject-ref <params>', description: 'Subject reference (type=character,image=path)' },
+    { flag: '--out-dir <dir>', description: 'Download images to directory' },
+    { flag: '--out-prefix <prefix>', description: 'Filename prefix (default: image)' },
+  ],
   examples: [
     'minimax image generate --prompt "A cat in a spacesuit on Mars" --aspect-ratio 16:9',
     'minimax image generate --prompt "Logo design" --n 3 --out-dir ./generated/',

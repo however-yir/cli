@@ -23,6 +23,9 @@ export default defineCommand({
   name: 'search query',
   description: 'Search the web via MiniMax',
   usage: 'minimax search query --q <query>',
+  options: [
+    { flag: '--q <query>', description: 'Search query string' },
+  ],
   examples: [
     'minimax search query --q "MiniMax AI"',
     'minimax search query --q "latest news" --output json',
