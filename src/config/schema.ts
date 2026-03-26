@@ -10,6 +10,7 @@ export type Region = keyof typeof REGIONS;
 export const ConfigSchema = z.object({
   api_key: z.string().optional(),
   region: z.enum(['global', 'cn']).default('global'),
+  region_key_fingerprint: z.string().optional(),
   base_url: z.string().url().optional(),
   output: z.enum(['text', 'json', 'yaml']).default('text'),
   timeout: z.number().positive().default(300),

@@ -91,7 +91,7 @@ Run `minimax <command> --help` to see the full list of options, defaults, and us
 | `video generate` | Create a video generation task | `--model`, `--prompt`, `--first-frame`, `--callback-url`, `--wait`, `--poll-interval`, `--download` |
 | `video task get` | Query video task status | `--task-id` |
 | `video download` | Download a completed video by file ID | `--file-id`, `--out` |
-| `music generate` | Generate a song | `--prompt`, `--lyrics`, `--lyrics-file`, `--auto-lyrics`, `--format`, `--sample-rate`, `--bitrate`, `--stream`, `--out`, `--out-format` |
+| `music generate` | Generate a song | `--prompt`, `--lyrics`, `--lyrics-file`, `--format`, `--sample-rate`, `--bitrate`, `--stream`, `--out`, `--out-format` |
 | `search query` | Search the web via MiniMax | `--q` |
 | `vision describe` | Describe an image using MiniMax VLM | `--image`, `--prompt` |
 | `quota show` | Display Token Plan usage and remaining quotas | — |
@@ -178,7 +178,7 @@ minimax music generate --prompt "Indie folk, melancholic" --lyrics "La la la..."
 minimax music generate --prompt "Upbeat pop" --lyrics-file song.txt --out summer.mp3
 
 # Auto-generated lyrics
-minimax music generate --prompt "Jazz lounge" --auto-lyrics --out jazz.mp3
+minimax music generate --prompt "Jazz lounge" --lyrics "Do do do..." --out jazz.mp3
 ```
 
 #### search

@@ -158,7 +158,6 @@ export interface MusicRequest {
   model: string;
   prompt?: string;
   lyrics?: string;
-  auto_lyrics?: boolean;
   audio_setting?: {
     format?: string;
     sample_rate?: number;

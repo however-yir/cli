@@ -47,7 +47,7 @@ export function parseArgs(argv: string[]): ParsedArgs {
 
       // Boolean flags
       if (['quiet', 'verbose', 'noColor', 'yes', 'dryRun', 'help', 'stream',
-           'subtitles', 'autoLyrics', 'wait', 'noBrowser'].includes(camelKey)) {
+           'subtitles', 'wait', 'noBrowser'].includes(camelKey)) {
         (flags as Record<string, unknown>)[camelKey] = true;
         i++;
         continue;

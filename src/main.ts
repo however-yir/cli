@@ -27,15 +27,15 @@ async function main() {
   const command = registry.resolve(commandPath);
   const config = loadConfig(flags);
 
-  // Auto-detect region on first run when no region is configured
+  // Auto-detect region when no explicit region is set and the API key has changed
   if (config.needsRegionDetection) {
-    const apiKey = config.apiKey || config.fileApiKey;
+    const apiKey = config.apiKey || config.fileApiKey || config.envApiKey;
     if (apiKey) {
       const detected = await detectRegion(apiKey);
       config.region = detected;
       config.baseUrl = REGIONS[detected];
       config.needsRegionDetection = false;
-      await saveDetectedRegion(detected);
+      await saveDetectedRegion(detected, apiKey.slice(0, 8));
     }
   }
 

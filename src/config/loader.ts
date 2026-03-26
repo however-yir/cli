@@ -28,11 +28,17 @@ export function loadConfig(flags: GlobalFlags): Config {
 
   const explicitRegion = (flags.region as string)
     || process.env.MINIMAX_REGION
-    || file.region
     || undefined;
 
-  const region = (explicitRegion || 'global') as Region;
-  const needsRegionDetection = !explicitRegion;
+  const cachedRegion = file.region;
+  const region = (explicitRegion || cachedRegion || 'global') as Region;
+
+  // Re-detect if: no explicit region AND (no cached region OR key fingerprint changed)
+  // Precedence must match resolver: flag > config file > env var (OAuth skipped — no stable fingerprint)
+  const activeKey = apiKey || fileApiKey || envApiKey;
+  const keyFingerprint = activeKey ? activeKey.slice(0, 8) : undefined;
+  const needsRegionDetection = !explicitRegion
+    && (!cachedRegion || (keyFingerprint !== undefined && keyFingerprint !== file.region_key_fingerprint));
 
   // Explicit --base-url overrides region-derived URL
   const baseUrl = flags.baseUrl

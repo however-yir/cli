@@ -17,7 +17,6 @@ export default defineCommand({
     { flag: '--prompt <text>', description: 'Music style description' },
     { flag: '--lyrics <text>', description: 'Song lyrics' },
     { flag: '--lyrics-file <path>', description: 'Read lyrics from file (use - for stdin)' },
-    { flag: '--auto-lyrics', description: 'Auto-generate lyrics from prompt' },
     { flag: '--format <fmt>', description: 'Audio format (default: mp3)' },
     { flag: '--sample-rate <hz>', description: 'Sample rate (default: 44100)' },
     { flag: '--bitrate <bps>', description: 'Bitrate (default: 256000)' },
@@ -27,7 +26,7 @@ export default defineCommand({
   ],
   examples: [
     'minimax music generate --prompt "Indie folk, melancholic" --lyrics-file song.txt --out my_song.mp3',
-    'minimax music generate --prompt "Upbeat pop" --auto-lyrics --out summer.mp3',
+    'minimax music generate --prompt "Upbeat pop" --lyrics "La la la..." --out summer.mp3',
     'minimax music generate --prompt "Jazz lounge" --out-format url --output json',
   ],
   async run(config: Config, flags: GlobalFlags) {
@@ -49,6 +48,10 @@ export default defineCommand({
       );
     }
 
+    if (!lyrics) {
+      process.stderr.write('Warning: No lyrics provided. Use --lyrics or --lyrics-file to include lyrics.\n');
+    }
+
     const outFormat = (flags.outFormat as string) || 'hex';
     const format = detectOutputFormat(config.output);
 
@@ -56,7 +59,6 @@ export default defineCommand({
       model: 'music-2.5',
       prompt,
       lyrics,
-      auto_lyrics: flags.autoLyrics === true || undefined,
       audio_setting: {
         format: (flags.format as string) || 'mp3',
         sample_rate: (flags.sampleRate as number) || 44100,

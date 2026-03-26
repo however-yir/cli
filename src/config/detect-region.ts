@@ -51,9 +51,9 @@ export async function detectRegion(apiKey: string): Promise<Region> {
 }
 
 /**
- * Saves the detected region to ~/.minimax/config.yaml.
+ * Saves the detected region and key fingerprint to ~/.minimax/config.yaml.
  */
-export async function saveDetectedRegion(region: Region): Promise<void> {
+export async function saveDetectedRegion(region: Region, keyFingerprint?: string): Promise<void> {
   await ensureConfigDir();
   const configPath = getConfigPath();
 
@@ -65,5 +65,8 @@ export async function saveDetectedRegion(region: Region): Promise<void> {
   }
 
   existing.region = region;
+  if (keyFingerprint) {
+    existing.region_key_fingerprint = keyFingerprint;
+  }
   writeFileSync(configPath, yamlStringify(existing), { mode: 0o600 });
 }
