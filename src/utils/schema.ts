@@ -66,10 +66,11 @@ export function generateToolSchema(cmd: Command): Record<string, unknown> {
         propSchema.type = effectiveType;
       }
 
-      (schema.input_schema as Record<string, unknown>).properties[name] = propSchema;
+      const inputSchema = schema.input_schema as Record<string, unknown>;
+      (inputSchema.properties as Record<string, unknown>)[name] = propSchema;
 
       if (opt.required) {
-        (schema.input_schema.required as string[]).push(name);
+        (inputSchema.required as string[]).push(name);
       }
     }
   }

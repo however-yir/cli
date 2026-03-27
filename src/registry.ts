@@ -1,4 +1,4 @@
-import { defineCommand } from './command';
+import type { Command } from './command';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
 
@@ -25,44 +25,7 @@ import fileList from './commands/file/list';
 import fileDelete from './commands/file/delete';
 import update from './commands/update';
 
-import type { Config } from './config/schema';
-import type { GlobalFlags } from './types/flags';
-
-export interface OptionDef {
-  flag: string;
-  description: string;
-  type?: 'string' | 'number' | 'boolean' | 'array';
-  required?: boolean;
-}
-
-export interface Command {
-  name: string;
-  description: string;
-  usage?: string;
-  options?: OptionDef[];
-  examples?: string[];
-  execute(config: Config, flags: GlobalFlags): Promise<void>;
-}
-
-export interface CommandSpec {
-  name: string;
-  description: string;
-  usage?: string;
-  options?: OptionDef[];
-  examples?: string[];
-  run(config: Config, flags: GlobalFlags): Promise<void>;
-}
-
-export function defineCommand(spec: CommandSpec): Command {
-  return {
-    name: spec.name,
-    description: spec.description,
-    usage: spec.usage,
-    options: spec.options,
-    examples: spec.examples,
-    execute: spec.run,
-  };
-}
+export type { Command, OptionDef } from './command';
 
 interface CommandNode {
   command?: Command;
@@ -145,7 +108,7 @@ class CommandRegistry {
    * Defaults to stdout; pass stderr (or a non-TTY stream) to keep stdout
    * clean for piped / JSON output.
    */
-  printHelp(commandPath: string[], out: typeof process.stdout = process.stdout): void {
+  printHelp(commandPath: string[], out: NodeJS.WriteStream = process.stdout): void {
     if (commandPath.length === 0) {
       this.printRootHelp(out);
       return;
@@ -173,7 +136,7 @@ class CommandRegistry {
     out.write('\n');
   }
 
-  private printRootHelp(out: typeof process.stdout): void {
+  private printRootHelp(out: NodeJS.WriteStream): void {
     out.write(`
   __  __ ___ _   _ ___ __  __    _   __  __
  |  \\/  |_ _| \\ | |_ _|  \\/  |  / \\ \\ \\/ /
@@ -219,7 +182,7 @@ Getting Help:
 `);
   }
 
-  private printCommandHelp(cmd: Command, out: typeof process.stdout): void {
+  private printCommandHelp(cmd: Command, out: NodeJS.WriteStream): void {
     out.write(`\n${cmd.description}\n`);
     if (cmd.usage) out.write(`Usage: ${cmd.usage}\n`);
     if (cmd.options && cmd.options.length > 0) {
@@ -241,7 +204,7 @@ Getting Help:
     out.write(`Run 'minimax --help' for the full list.\n`);
   }
 
-  private printChildren(node: CommandNode, prefix: string, out: typeof process.stdout): void {
+  private printChildren(node: CommandNode, prefix: string, out: NodeJS.WriteStream): void {
     for (const [name, child] of node.children) {
       if (child.command) {
         out.write(`  ${prefix} ${name.padEnd(12)} ${child.command.description}\n`);
