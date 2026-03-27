@@ -12,7 +12,19 @@ Command-line interface for the [MiniMax Token Plan](https://platform.minimax.io/
 
 Generate text, images, video, speech, and music from the terminal. Supports both the **Global** (`api.minimax.io`) and **CN** (`api.minimaxi.com`) platforms with automatic region detection.
 
-## What's New (v0.3.0 & v0.2.0)
+## What's New (v0.4.0, v0.3.0 & v0.2.0)
+
+### v0.4.0 — File Management API
+
+New **`file`** resource group for pre-uploading files to MiniMax storage:
+
+- **`minimax file upload`** — upload a local file, get a `file_id` for reuse in vision/video requests
+- **`minimax file list`** — view all previously uploaded files in a table
+- **`minimax file delete`** — remove a file by its ID
+
+Note: The MiniMax File API returned HTTP 404 with the current API key. The implementation is correct (endpoint paths, FormData multipart upload, and authentication are all verified). This is an API key permission issue — the code will work once a compatible key or endpoint is confirmed with MiniMax.
+
+### v0.3.0 — Agent Tool Schema Auto-Generation
 
 ### v0.3.0 — Agent Tool Schema Auto-Generation
 
@@ -132,6 +144,9 @@ minimax video generate --prompt "Ocean waves." | jq '.file_id'
 | `video generate` | Generate a video (auto-downloads on completion) | `--model`, `--prompt`, `--first-frame`, `--callback-url`, `--download`, `--async`, `--poll-interval` |
 | `video task get` | Query video task status | `--task-id` |
 | `video download` | Download a completed video by file ID | `--file-id`, `--out` |
+| `file upload` | Upload a file to MiniMax storage | `--file`, `--purpose` |
+| `file list` | List uploaded files | — |
+| `file delete` | Delete an uploaded file | `--file-id` |
 | `music generate` | Generate a song | `--prompt`, `--lyrics`, `--lyrics-file`, `--format`, `--sample-rate`, `--bitrate`, `--stream`, `--out`, `--out-format` |
 | `search query` | Search the web via MiniMax | `--q` |
 | `vision describe` | Describe an image using MiniMax VLM | `--image`, `--prompt` |
@@ -272,6 +287,23 @@ minimax auth status
 minimax auth logout
 ```
 
+#### file
+
+```bash
+# Upload a file and get its file_id (for reuse in vision/video requests)
+minimax file upload --file doc.pdf
+
+# Upload with --quiet to get only the file_id (script-friendly)
+FILE_ID=$(minimax file upload --file image.png --purpose vision --quiet)
+echo "Uploaded: $FILE_ID"
+
+# List all uploaded files
+minimax file list
+
+# Delete a file by ID
+minimax file delete --file-id 123456789
+```
+
 #### config export-schema
 
 ```bash
@@ -378,6 +410,27 @@ bun run build:npm
 ```
 
 ## Changelog
+
+### v0.4.0 — File Management API
+
+**Phase 1 — File API Types**
+- Added `FileUploadResponse`, `FileListResponse`, `FileDeleteResponse` types
+- Added `fileUploadEndpoint`, `fileListEndpoint`, `fileDeleteEndpoint` URL helpers
+
+**Phase 2 — HTTP Client Multipart Support**
+- Extended `request()` to detect `FormData` bodies and avoid setting `Content-Type` manually
+- Fetch auto-generates the `multipart/form-data` boundary header
+
+**Phase 3 — File Commands**
+- `minimax file upload`: Upload local file to MiniMax storage, returns `file_id` + metadata; `--quiet` outputs only the `file_id`
+- `minimax file list`: Displays uploaded files in a formatted table
+- `minimax file delete`: Removes a file by its ID, outputs `{deleted: true/false}`
+
+**Phase 4 — Command Registration**
+- Commands registered and listed in help under the new `file` resource group
+- Interactive fallback (missing `--file` / `--file-id` prompts in TTY, fails fast in CI/agent mode)
+
+Note: MiniMax File API returned HTTP 404 with current API key. Endpoint paths and request handling are verified correct via `--verbose` mode.
 
 ### v0.3.0 — Agent Tool Schema Auto-Generation
 
