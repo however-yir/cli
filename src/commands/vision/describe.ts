@@ -8,6 +8,8 @@ import type { Config } from '../../config/schema';
 import type { GlobalFlags } from '../../types/flags';
 import { readFileSync, existsSync } from 'fs';
 import { extname } from 'path';
+import { isInteractive } from '../../utils/env';
+import { promptText, failIfMissing } from '../../utils/prompt';
 
 interface VlmResponse {
   content: string;
@@ -76,15 +78,22 @@ export default defineCommand({
     'minimax vision describe --image screenshot.png --prompt "Extract the text" --output json',
   ],
   async run(config: Config, flags: GlobalFlags) {
-    const image = flags.image as string | undefined;
+    let image = flags.image as string | undefined;
     const prompt = (flags.prompt as string) || 'Describe the image.';
 
     if (!image) {
-      throw new CLIError(
-        '--image is required.',
-        ExitCode.USAGE,
-        'minimax vision describe --image <path-or-url>',
-      );
+      if (isInteractive({ nonInteractive: config.nonInteractive })) {
+        const hint = await promptText({
+          message: 'Enter image path or URL:',
+        });
+        if (!hint) {
+          process.stderr.write('Vision describe cancelled.\n');
+          process.exit(1);
+        }
+        image = hint;
+      } else {
+        failIfMissing('image', 'minimax vision describe --image <path-or-url>');
+      }
     }
 
     const format = detectOutputFormat(config.output);

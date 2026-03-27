@@ -1,4 +1,4 @@
-import type { Command } from './command';
+import { defineCommand } from './command';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
 
@@ -20,6 +20,43 @@ import quotaShow from './commands/quota/show';
 import configShow from './commands/config/show';
 import configSet from './commands/config/set';
 import update from './commands/update';
+
+import type { Config } from './config/schema';
+import type { GlobalFlags } from './types/flags';
+
+export interface OptionDef {
+  flag: string;
+  description: string;
+}
+
+export interface Command {
+  name: string;
+  description: string;
+  usage?: string;
+  options?: OptionDef[];
+  examples?: string[];
+  execute(config: Config, flags: GlobalFlags): Promise<void>;
+}
+
+export interface CommandSpec {
+  name: string;
+  description: string;
+  usage?: string;
+  options?: OptionDef[];
+  examples?: string[];
+  run(config: Config, flags: GlobalFlags): Promise<void>;
+}
+
+export function defineCommand(spec: CommandSpec): Command {
+  return {
+    name: spec.name,
+    description: spec.description,
+    usage: spec.usage,
+    options: spec.options,
+    examples: spec.examples,
+    execute: spec.run,
+  };
+}
 
 interface CommandNode {
   command?: Command;
@@ -67,7 +104,6 @@ class CommandRegistry {
       const subcommands = Array.from(node.children.entries())
         .map(([name, n]) => {
           if (n.command) return `  ${matched.join(' ')} ${name}    ${n.command.description}`;
-          // Group with sub-children
           const subs = Array.from(n.children.keys()).join(', ');
           return `  ${matched.join(' ')} ${name} [${subs}]`;
         })
@@ -86,9 +122,14 @@ class CommandRegistry {
     );
   }
 
-  printHelp(commandPath: string[]): void {
+  /**
+   * Print help to the given output stream.
+   * Defaults to stdout; pass stderr (or a non-TTY stream) to keep stdout
+   * clean for piped / JSON output.
+   */
+  printHelp(commandPath: string[], out: typeof process.stdout = process.stdout): void {
     if (commandPath.length === 0) {
-      this.printRootHelp();
+      this.printRootHelp(out);
       return;
     }
 
@@ -96,31 +137,31 @@ class CommandRegistry {
     for (const part of commandPath) {
       const child = node.children.get(part);
       if (!child) {
-        this.printRootHelp();
+        this.printRootHelp(out);
         return;
       }
       node = child;
     }
 
     if (node.command) {
-      this.printCommandHelp(node.command);
+      this.printCommandHelp(node.command, out);
       return;
     }
 
     // Group help
-    console.log(`\nUsage: minimax ${commandPath.join(' ')} <command> [flags]\n`);
-    console.log('Commands:');
-    this.printChildren(node, commandPath.join(' '));
-    console.log('');
+    out.write(`\nUsage: minimax ${commandPath.join(' ')} <command> [flags]\n\n`);
+    out.write('Commands:\n');
+    this.printChildren(node, commandPath.join(' '), out);
+    out.write('\n');
   }
 
-  private printRootHelp(): void {
-    console.log(`
+  private printRootHelp(out: typeof process.stdout): void {
+    out.write(`
   __  __ ___ _   _ ___ __  __    _   __  __
  |  \\/  |_ _| \\ | |_ _|  \\/  |  / \\ \\ \\/ /
  | |\\/| || ||  \\| || || |\\/| | / _ \\ \\  /
  | |  | || || |\\  || || |  | |/ ___ \\/  \\
- |_|  |_|___|_| \\_|___|_|  |_/_/   \\_\\/_/\\
+ |_|  |_|___|_| \\_|___|_|  |_/_/   \\_\\_/\\
 
 Usage: minimax <resource> <command> [flags]
 
@@ -148,6 +189,8 @@ Global Flags:
   --no-color             Disable ANSI colors and spinners
   --yes                  Skip confirmation prompts
   --dry-run              Show what would happen without executing
+  --non-interactive      Disable interactive prompts (CI/agent mode)
+  --async                Return task ID immediately without polling
   --version              Print version and exit
   --help                 Show help
 
@@ -157,37 +200,35 @@ Getting Help:
 `);
   }
 
-  private printCommandHelp(cmd: Command): void {
-    console.log(`\n${cmd.description}\n`);
-    if (cmd.usage) {
-      console.log(`Usage: ${cmd.usage}\n`);
-    }
+  private printCommandHelp(cmd: Command, out: typeof process.stdout): void {
+    out.write(`\n${cmd.description}\n`);
+    if (cmd.usage) out.write(`Usage: ${cmd.usage}\n`);
     if (cmd.options && cmd.options.length > 0) {
       const maxLen = Math.max(...cmd.options.map(o => o.flag.length));
-      console.log('Options:');
+      out.write('Options:\n');
       for (const opt of cmd.options) {
-        console.log(`  ${opt.flag.padEnd(maxLen + 2)} ${opt.description}`);
+        out.write(`  ${opt.flag.padEnd(maxLen + 2)} ${opt.description}\n`);
       }
-      console.log('');
+      out.write('\n');
     }
     if (cmd.examples && cmd.examples.length > 0) {
-      console.log('Examples:');
+      out.write('Examples:\n');
       for (const ex of cmd.examples) {
-        console.log(`  ${ex}`);
+        out.write(`  ${ex}\n`);
       }
-      console.log('');
+      out.write('\n');
     }
-    console.log(`Global flags (--api-key, --output, --quiet, etc.) are always available.`);
-    console.log(`Run 'minimax --help' for the full list.\n`);
+    out.write(`Global flags (--api-key, --output, --quiet, etc.) are always available.\n`);
+    out.write(`Run 'minimax --help' for the full list.\n`);
   }
 
-  private printChildren(node: CommandNode, prefix: string): void {
+  private printChildren(node: CommandNode, prefix: string, out: typeof process.stdout): void {
     for (const [name, child] of node.children) {
       if (child.command) {
-        console.log(`  ${prefix} ${name.padEnd(12)} ${child.command.description}`);
+        out.write(`  ${prefix} ${name.padEnd(12)} ${child.command.description}\n`);
       }
       if (child.children.size > 0) {
-        this.printChildren(child, `${prefix} ${name}`);
+        this.printChildren(child, `${prefix} ${name}`, out);
       }
     }
   }
@@ -208,8 +249,8 @@ export const registry = new CommandRegistry({
   'music generate':    musicGenerate,
   'search query':      searchQuery,
   'vision describe':   visionDescribe,
-  'quota show':        quotaShow,
-  'config show':       configShow,
-  'config set':        configSet,
-  'update':            update,
+  'quota show':       quotaShow,
+  'config show':      configShow,
+  'config set':       configSet,
+  'update':           update,
 });
