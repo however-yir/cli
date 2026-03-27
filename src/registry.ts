@@ -19,6 +19,7 @@ import visionDescribe from './commands/vision/describe';
 import quotaShow from './commands/quota/show';
 import configShow from './commands/config/show';
 import configSet from './commands/config/set';
+import configExportSchema from './commands/config/export-schema';
 import update from './commands/update';
 
 import type { Config } from './config/schema';
@@ -27,6 +28,8 @@ import type { GlobalFlags } from './types/flags';
 export interface OptionDef {
   flag: string;
   description: string;
+  type?: 'string' | 'number' | 'boolean' | 'array';
+  required?: boolean;
 }
 
 export interface Command {
@@ -82,6 +85,18 @@ class CommandRegistry {
       node = node.children.get(part)!;
     }
     node.command = command;
+  }
+
+  getAllCommands(): Command[] {
+    const commands: Command[] = [];
+    const traverse = (node: CommandNode) => {
+      if (node.command) commands.push(node.command);
+      for (const child of node.children.values()) {
+        traverse(child);
+      }
+    };
+    traverse(this.root);
+    return commands;
   }
 
   resolve(commandPath: string[]): { command: Command; extra: string[] } {
@@ -252,5 +267,6 @@ export const registry = new CommandRegistry({
   'quota show':       quotaShow,
   'config show':      configShow,
   'config set':       configSet,
+  'config export-schema': configExportSchema,
   'update':           update,
 });

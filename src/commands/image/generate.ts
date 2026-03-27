@@ -18,7 +18,7 @@ export default defineCommand({
   description: 'Generate images (image-01)',
   usage: 'minimax image generate --prompt <text> [flags]',
   options: [
-    { flag: '--prompt <text>', description: 'Image description' },
+    { flag: '--prompt <text>', description: 'Image description', required: true },
     { flag: '--aspect-ratio <ratio>', description: 'Aspect ratio (e.g. 16:9, 1:1)' },
     { flag: '--n <count>', description: 'Number of images to generate (default: 1)' },
     { flag: '--subject-ref <params>', description: 'Subject reference (type=character,image=path)' },

@@ -83,7 +83,7 @@ export default defineCommand({
   usage: 'minimax text chat --message <text> [flags]',
   options: [
     { flag: '--model <model>', description: 'Model ID (default: MiniMax-M2.7)' },
-    { flag: '--message <text>', description: 'Message text (repeatable, prefix role: to set role)' },
+    { flag: '--message <text>', description: 'Message text (repeatable, prefix role: to set role)', required: true },
     { flag: '--messages-file <path>', description: 'JSON file with messages array (use - for stdin)' },
     { flag: '--system <text>', description: 'System prompt' },
     { flag: '--max-tokens <n>', description: 'Maximum tokens to generate (default: 4096)' },

@@ -19,7 +19,7 @@ export default defineCommand({
   usage: 'minimax video generate --prompt <text> [flags]',
   options: [
     { flag: '--model <model>', description: 'Model ID (default: MiniMax-Hailuo-2.3)' },
-    { flag: '--prompt <text>', description: 'Video description' },
+    { flag: '--prompt <text>', description: 'Video description', required: true },
     { flag: '--first-frame <path-or-url>', description: 'First frame image' },
     { flag: '--callback-url <url>', description: 'Webhook URL for completion notification' },
     { flag: '--download <path>', description: 'Save video to file on completion' },
