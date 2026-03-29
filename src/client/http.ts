@@ -45,6 +45,41 @@ export async function request(
       process.stderr.write(`> ${opts.method || 'GET'} ${opts.url}\n`);
       process.stderr.write(`> Auth: ${credential.token.slice(0, 8)}...\n`);
     }
+
+    // ANSI 真彩色 (24-bit) 与基础排版
+    if (process.stderr.isTTY) {
+      const reset = '\x1b[0m';
+      const dim = '\x1b[2m';
+      const bold = '\x1b[1m'; // 新增加粗效果
+
+      // 从 MiniMax Logo/品牌视觉提取的 RGB 颜色
+      const mmBlue = '\x1b[38;2;43;82;255m';    // 主品牌色：MiniMax 科技蓝 (#2B52FF)
+      const mmPurple = '\x1b[38;2;147;51;234m'; // 辅助品牌色：活力紫 (#9333EA)
+      const mmCyan = '\x1b[38;2;6;184;212m';   // 点缀色：青色 (#06B8D4)
+      const mmPink = '\x1b[38;2;236;72;153m';   // 点缀色：粉红 (#EC4899)
+
+      // 提取 Region (根据 baseUrl 推断)
+      const region = config.baseUrl.includes('minimaxi.com') ? 'CN' : 'Global';
+
+      // 提取脱敏的 Key
+      const token = credential.token;
+      const maskedKey = token.length > 8 ? `${token.slice(0, 4)}...${token.slice(-4)}` : '***';
+
+      // 尝试从 body 中提取 Model
+      let modelStr = '';
+      if (opts.body && typeof opts.body === 'object' && 'model' in opts.body) {
+        modelStr = ` ${dim}|${reset} ${dim}Model:${reset} ${mmPurple}${(opts.body as any).model}${reset}`;
+      }
+
+      // 打印带有完整 MINIMAX 标识的状态栏
+      process.stderr.write(
+        `${bold}${mmBlue}MINIMAX${reset} ` +
+        `${dim}Region:${reset} ${mmCyan}${region}${reset} ` +
+        `${dim}|${reset} ` +
+        `${dim}Key:${reset} ${mmPink}${maskedKey}${reset}` +
+        `${modelStr}\n`
+      );
+    }
   }
 
   const timeoutMs = (opts.timeout || config.timeout) * 1000;
