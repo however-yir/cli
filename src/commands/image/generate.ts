@@ -31,7 +31,7 @@ export default defineCommand({
     'minimax image generate --prompt "Mountain landscape" --quiet',
   ],
   async run(config: Config, flags: GlobalFlags) {
-    let prompt = flags.prompt as string | undefined;
+    let prompt = (flags.prompt ?? (flags._positional as string[]|undefined)?.[0]) as string | undefined;
 
     if (!prompt) {
       if (isInteractive({ nonInteractive: config.nonInteractive })) {

@@ -39,7 +39,7 @@ export default defineCommand({
     'minimax speech synthesize --text "Stream" --stream | mpv --no-terminal -',
   ],
   async run(config: Config, flags: GlobalFlags) {
-    let text = flags.text as string | undefined;
+    let text = (flags.text ?? (flags._positional as string[]|undefined)?.[0]) as string | undefined;
 
     if (flags.textFile) {
       const path = flags.textFile as string;
