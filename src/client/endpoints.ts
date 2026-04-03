@@ -39,8 +39,8 @@ export function vlmEndpoint(baseUrl: string): string {
 }
 
 export function quotaEndpoint(baseUrl: string): string {
-  // Quota endpoint uses www subdomain, not api subdomain
-  const host = baseUrl.includes('minimaxi.com') ? 'https://www.minimaxi.com' : 'https://www.minimax.io';
+  // Quota endpoint uses api subdomain
+  const host = baseUrl.includes('minimaxi.com') ? 'https://api.minimaxi.com' : 'https://api.minimax.io';
   return `${host}/v1/api/openplatform/coding_plan/remains`;
 }
 

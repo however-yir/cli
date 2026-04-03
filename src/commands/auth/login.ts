@@ -32,7 +32,7 @@ export default defineCommand({
   ],
   async run(config: Config, flags: GlobalFlags) {
     const envKey = process.env.MINIMAX_API_KEY;
-    if (envKey) {
+    if (envKey && !flags.apiKey) {
       const maskedEnvKey = maskToken(envKey);
       if (isInteractive({ nonInteractive: config.nonInteractive })) {
         const { confirm } = await import('@clack/prompts');

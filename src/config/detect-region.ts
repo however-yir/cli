@@ -4,7 +4,7 @@ import { readConfigFile, writeConfigFile } from './loader';
 const QUOTA_PATH = '/v1/api/openplatform/coding_plan/remains';
 
 function quotaUrl(region: Region): string {
-  return REGIONS[region].replace('://api.', '://www.') + QUOTA_PATH;
+  return REGIONS[region] + QUOTA_PATH;
 }
 
 async function probeRegion(region: Region, apiKey: string, timeoutMs: number): Promise<boolean> {
