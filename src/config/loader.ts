@@ -50,10 +50,10 @@ export function loadConfig(flags: GlobalFlags): Config {
     flags.output || process.env.MINIMAX_OUTPUT || file.output,
   );
 
-  const timeout = flags.timeout
-    ?? (process.env.MINIMAX_TIMEOUT ? Number(process.env.MINIMAX_TIMEOUT) : undefined)
-    ?? file.timeout
-    ?? 300;
+  const envTimeout = process.env.MINIMAX_TIMEOUT ? Number(process.env.MINIMAX_TIMEOUT) : undefined;
+  const validEnvTimeout = envTimeout !== undefined && Number.isFinite(envTimeout) && envTimeout > 0
+    ? envTimeout : undefined;
+  const timeout = flags.timeout ?? validEnvTimeout ?? file.timeout ?? 300;
 
   return {
     apiKey,
