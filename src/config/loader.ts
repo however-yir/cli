@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'fs';
 import { parseConfigFile, REGIONS, type Config, type ConfigFile, type Region } from './schema';
 import { ensureConfigDir, getConfigPath } from './paths';
 import { detectOutputFormat, type OutputFormat } from '../output/formatter';
@@ -20,7 +20,10 @@ export function readConfigFile(): ConfigFile {
 
 export async function writeConfigFile(data: Record<string, unknown>): Promise<void> {
   await ensureConfigDir();
-  writeFileSync(getConfigPath(), JSON.stringify(data, null, 2) + '\n', { mode: 0o600 });
+  const path = getConfigPath();
+  const tmp = path + '.tmp';
+  writeFileSync(tmp, JSON.stringify(data, null, 2) + '\n', { mode: 0o600 });
+  renameSync(tmp, path);
 }
 
 export function loadConfig(flags: GlobalFlags): Config {

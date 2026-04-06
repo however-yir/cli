@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, unlinkSync, existsSync, statSync } from 'fs';
 import { getCredentialsPath, ensureConfigDir } from '../config/paths';
 import type { CredentialFile } from './types';
 
@@ -24,7 +24,9 @@ export async function loadCredentials(): Promise<CredentialFile | null> {
 export async function saveCredentials(creds: CredentialFile): Promise<void> {
   await ensureConfigDir();
   const path = getCredentialsPath();
-  writeFileSync(path, JSON.stringify(creds, null, 2) + '\n', { mode: 0o600 });
+  const tmp = path + '.tmp';
+  writeFileSync(tmp, JSON.stringify(creds, null, 2) + '\n', { mode: 0o600 });
+  renameSync(tmp, path);
 }
 
 export async function clearCredentials(): Promise<void> {
