@@ -147,6 +147,10 @@ mmx update
 mmx update latest
 ```
 
+## 贡献者
+
+[![Contributors](https://contrib.rocks/image?repo=MiniMax-AI/cli)](https://github.com/MiniMax-AI/cli/graphs/contributors)
+
 ## 许可证
 
 [MIT](LICENSE)
