@@ -47,7 +47,7 @@ mmx text chat --message "What is MiniMax?"
 mmx image "A cat in a spacesuit"
 mmx speech synthesize --text "Hello!" --out hello.mp3
 mmx video generate --prompt "Ocean waves at sunset"
-mmx music "Upbeat pop"
+mmx music generate --prompt "Upbeat pop" --lyrics "[verse] La da dee, sunny day"
 mmx search "MiniMax AI latest news"
 mmx vision photo.jpg
 mmx quota
@@ -87,7 +87,7 @@ mmx video download --file-id 176844028768320 --out video.mp4
 ```bash
 mmx speech synthesize --text "Hello!" --out hello.mp3
 mmx speech synthesize --text "Stream me" --stream | mpv -
-mmx speech synthesize --text "Hi" --voice Boyan_new_hailuo --speed 1.2
+mmx speech synthesize --text "Hi" --voice English_magnetic_voiced_man --speed 1.2
 echo "Breaking news" | mmx speech synthesize --text-file - --out news.mp3
 mmx speech voices
 ```
@@ -95,8 +95,9 @@ mmx speech voices
 ### `mmx music`
 
 ```bash
-mmx music "Upbeat pop"
+mmx music generate --prompt "Upbeat pop" --lyrics "[verse] La da dee, sunny day"
 mmx music generate --prompt "Jazz" --lyrics "La la la" --out song.mp3
+mmx music generate --prompt "Cinematic orchestral" --instrumental --out bgm.mp3
 ```
 
 ### `mmx vision`

@@ -38,6 +38,12 @@ describe('music generate command', () => {
     ).rejects.toThrow('At least one of --prompt or --lyrics is required');
   });
 
+  it('requires lyrics when only prompt is given (API contract)', async () => {
+    await expect(
+      generateCommand.execute(baseConfig, { ...baseFlags, prompt: 'Upbeat pop' }),
+    ).rejects.toThrow('The API requires lyrics');
+  });
+
   it('structured flags are appended to prompt (dry-run)', async () => {
     // Use dryRun=true so no real API call is made.
     let resolved = false;
@@ -48,6 +54,7 @@ describe('music generate command', () => {
           ...baseFlags,
           dryRun: true,
           prompt: 'Indie folk',
+          lyrics: '[verse] placeholder',
           vocals: 'warm male and bright female duet',
           genre: 'folk',
           mood: 'warm',
@@ -57,7 +64,7 @@ describe('music generate command', () => {
         },
       );
       resolved = true;
-    } catch (_) {
+    } catch {
       // dryRun may resolve or reject depending on output routing; either is fine
       resolved = true;
     }
@@ -116,7 +123,7 @@ describe('music generate command', () => {
         { ...baseFlags, dryRun: true, prompt: 'Folk', lyrics: '无歌词' },
       );
       resolved = true;
-    } catch (_) {
+    } catch {
       resolved = true;
     }
     expect(resolved).toBe(true);
@@ -130,7 +137,7 @@ describe('music generate command', () => {
         { ...baseFlags, dryRun: true, prompt: 'Folk', lyrics: 'no lyrics' },
       );
       resolved = true;
-    } catch (_) {
+    } catch {
       resolved = true;
     }
     expect(resolved).toBe(true);

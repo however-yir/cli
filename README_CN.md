@@ -47,7 +47,7 @@ mmx text chat --message "你好，MiniMax！"
 mmx image "一只穿宇航服的猫"
 mmx speech synthesize --text "你好！" --out hello.mp3
 mmx video generate --prompt "海浪拍打礁石"
-mmx music "欢快的流行乐"
+mmx music generate --prompt "欢快的流行乐" --lyrics "[主歌] 啦啦啦，阳光照"
 mmx search "MiniMax AI 最新动态"
 mmx vision photo.jpg
 mmx quota
@@ -87,7 +87,7 @@ mmx video download --file-id 176844028768320 --out video.mp4
 ```bash
 mmx speech synthesize --text "你好！" --out hello.mp3
 mmx speech synthesize --text "流式输出" --stream | mpv -
-mmx speech synthesize --text "Hi" --voice Boyan_new_hailuo --speed 1.2
+mmx speech synthesize --text "Hi" --voice English_magnetic_voiced_man --speed 1.2
 echo "头条新闻" | mmx speech synthesize --text-file - --out news.mp3
 mmx speech voices
 ```
@@ -95,8 +95,9 @@ mmx speech voices
 ### `mmx music`
 
 ```bash
-mmx music "欢快的流行乐"
+mmx music generate --prompt "欢快的流行乐" --lyrics "[主歌] 啦啦啦，阳光照"
 mmx music generate --prompt "爵士风" --lyrics "啦啦啦" --out song.mp3
+mmx music generate --prompt "史诗管弦乐" --instrumental --out bgm.mp3
 ```
 
 ### `mmx vision`

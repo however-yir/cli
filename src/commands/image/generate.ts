@@ -107,44 +107,28 @@ export default defineCommand({
       process.stderr.write('[Model: image-01]\n');
     }
 
-    // Download if --out-dir specified
-    if (flags.outDir) {
-      const outDir = flags.outDir as string;
-      if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+    const outDir = (flags.outDir as string | undefined) ?? '.';
+    if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 
-      const prefix = (flags.outPrefix as string) || 'image';
-      const saved: string[] = [];
+    const prefix = (flags.outPrefix as string) || 'image';
+    const saved: string[] = [];
 
-      for (let i = 0; i < imageUrls.length; i++) {
-        const filename = `${prefix}_${String(i + 1).padStart(3, '0')}.jpg`;
-        const destPath = join(outDir, filename);
-        await downloadFile(imageUrls[i]!, destPath, { quiet: config.quiet });
-        saved.push(destPath);
-      }
-
-      if (config.quiet) {
-        console.log(saved.join('\n'));
-      } else {
-        console.log(formatOutput({
-          id: response.data.task_id,
-          saved,
-          success_count: response.data.success_count,
-          failed_count: response.data.failed_count,
-        }, format));
-      }
-      return;
+    for (let i = 0; i < imageUrls.length; i++) {
+      const filename = `${prefix}_${String(i + 1).padStart(3, '0')}.jpg`;
+      const destPath = join(outDir, filename);
+      await downloadFile(imageUrls[i]!, destPath, { quiet: config.quiet });
+      saved.push(destPath);
     }
 
     if (config.quiet) {
-      console.log(imageUrls.join('\n'));
-      return;
+      console.log(saved.join('\n'));
+    } else {
+      console.log(formatOutput({
+        id: response.data.task_id,
+        saved,
+        success_count: response.data.success_count,
+        failed_count: response.data.failed_count,
+      }, format));
     }
-
-    console.log(formatOutput({
-      id: response.data.task_id,
-      images: imageUrls,
-      success_count: response.data.success_count,
-      failed_count: response.data.failed_count,
-    }, format));
   },
 });

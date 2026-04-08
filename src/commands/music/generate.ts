@@ -13,7 +13,7 @@ import type { MusicRequest, MusicResponse } from '../../types/api';
 export default defineCommand({
   name: 'music generate',
   description: 'Generate a song (music-2.5)',
-  usage: 'mmx music generate --prompt <text> [--lyrics <text>] [--out <path>] [flags]',
+  usage: 'mmx music generate --prompt <text> (--lyrics <text> | --instrumental) [--out <path>] [flags]',
   options: [
     { flag: '--prompt <text>', description: 'Music style description (can be detailed — see examples)' },
     { flag: '--lyrics <text>', description: 'Song lyrics with structure tags. Use "无歌词" for instrumental music. Cannot be used with --instrumental.' },
@@ -100,12 +100,16 @@ export default defineCommand({
       throw new CLIError(
         'At least one of --prompt or --lyrics is required.',
         ExitCode.USAGE,
-        'mmx music generate --prompt <text> [--lyrics <text>]',
+        'mmx music generate --prompt <text> --lyrics <text>',
       );
     }
 
-    if (!lyrics) {
-      process.stderr.write('Warning: No lyrics provided. Use --lyrics or --lyrics-file to include lyrics.\n');
+    if (!lyrics?.trim()) {
+      throw new CLIError(
+        'The API requires lyrics. Add --lyrics or --lyrics-file, or use --instrumental (or --lyrics "无歌词") for instrumental output.',
+        ExitCode.USAGE,
+        'mmx music generate --prompt <text> --lyrics <text>',
+      );
     }
 
     if (structuredParts.length > 0) {
@@ -113,8 +117,10 @@ export default defineCommand({
       prompt = prompt ? `${prompt}. ${structured}` : structured;
     }
 
-    const outPath = flags.out as string | undefined;
-    const outFormat = outPath ? 'hex' : 'url';
+    const ts = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+    const ext = (flags.format as string) || 'mp3';
+    const outPath = (flags.out as string | undefined) ?? `music_${ts}.${ext}`;
+    const outFormat = 'hex';
     const format = detectOutputFormat(config.output);
 
     const body: MusicRequest = {

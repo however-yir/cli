@@ -55,8 +55,9 @@ export default defineCommand({
 
     const model = (flags.model as string) || 'speech-2.8-hd';
     const voice = (flags.voice as string) || 'English_expressive_narrator';
-    const outPath = flags.out as string | undefined;
-    const outFormat = outPath ? 'hex' : 'url';
+    const ts = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+    const outPath = (flags.out as string | undefined) ?? `speech_${ts}.mp3`;
+    const outFormat = 'hex';
     const format = detectOutputFormat(config.output);
 
     const body: SpeechRequest = {
