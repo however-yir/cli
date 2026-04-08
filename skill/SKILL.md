@@ -10,6 +10,9 @@ Use `mmx` to generate text, images, video, speech, music, and perform web search
 ## Prerequisites
 
 ```bash
+# Install
+npm install -g mmx-cli
+
 # Auth (persisted to ~/.mmx/credentials.json)
 mmx auth login --api-key sk-xxxxx
 
