@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> · <a href="https://platform.minimaxi.com">开放平台</a>
+  <a href="README.md">English</a> · <a href="https://platform.minimax.io">国际版平台</a> · <a href="https://platform.minimaxi.com">国内版平台</a>
 </p>
 
 ## 功能特性
@@ -40,11 +40,7 @@ npx skills add MiniMax-AI/cli -y -g
 
 > 需要 [Node.js](https://nodejs.org) 18+
 
-> **需要 MiniMax Token 套餐**
-> | 区域 | 开放平台 | API 地址 |
-> |------|----------|----------|
-> | 国际版 | [platform.minimax.io](https://platform.minimax.io) | `api.minimax.io` |
-> | 国内版 | [platform.minimaxi.com](https://platform.minimaxi.com) | `api.minimaxi.com` |
+> **需要 MiniMax Token 套餐** — [国际版](https://platform.minimax.io/subscribe/token-plan) · [国内版](https://platform.minimaxi.com/subscribe/token-plan)
 
 ## 快速开始
 

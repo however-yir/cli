@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="README_CN.md">中文文档</a> · <a href="https://platform.minimax.io">Platform</a>
+  <a href="README_CN.md">中文文档</a> · <a href="https://platform.minimax.io">Global Platform</a> · <a href="https://platform.minimaxi.com">CN Platform</a>
 </p>
 
 ## Features
@@ -40,11 +40,7 @@ npx skills add MiniMax-AI/cli -y -g
 
 > Requires [Node.js](https://nodejs.org) 18+
 
-> **Requires a MiniMax Token Plan**
-> | Region | Platform | API Endpoint |
-> |--------|----------|--------------|
-> | Global | [platform.minimax.io](https://platform.minimax.io) | `api.minimax.io` |
-> | CN | [platform.minimaxi.com](https://platform.minimaxi.com) | `api.minimaxi.com` |
+> **Requires a MiniMax Token Plan** — [Global](https://platform.minimax.io/subscribe/token-plan) · [CN](https://platform.minimaxi.com/subscribe/token-plan)
 
 ## Quick Start
 
