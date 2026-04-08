@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>MiniMax AI 开放平台官方命令行工具</strong><br>
-  在终端或 AI Agent 中生成文字、图像、视频、语音和音乐。
+  专为 AI Agent 打造。在任意 Agent 或终端中生成文字、图像、视频、语音和音乐。
 </p>
 
 <p align="center">
@@ -31,11 +31,11 @@
 ## 安装
 
 ```bash
-# 直接使用：全局安装 CLI
-npm install -g mmx-cli
-
 # AI Agent 使用（Cursor、Claude Code 等）：添加 Skill 到你的 Agent
 npx skills add MiniMax-AI/cli -y -g
+
+# 或全局安装 CLI 在终端中使用
+npm install -g mmx-cli
 ```
 
 > 需要 [Node.js](https://nodejs.org) 18+

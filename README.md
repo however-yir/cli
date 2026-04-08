@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>The official CLI for the MiniMax AI Platform</strong><br>
-  Generate text, images, video, speech, and music — from your terminal or AI agent.
+  Built for AI agents. Generate text, images, video, speech, and music — from any agent or terminal.
 </p>
 
 <p align="center">
@@ -31,11 +31,11 @@
 ## Install
 
 ```bash
-# For humans: install CLI globally
-npm install -g mmx-cli
-
-# For AI agents (Cursor, Claude Code, OpenCode, etc.): add skill to your agent
+# For AI agents (Cursor, Claude Code, etc.): add skill to your agent
 npx skills add MiniMax-AI/cli -y -g
+
+# Or install CLI globally for terminal use
+npm install -g mmx-cli
 ```
 
 > Requires [Node.js](https://nodejs.org) 18+
