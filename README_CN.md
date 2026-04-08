@@ -31,7 +31,7 @@
 ## 安装
 
 ```bash
-# AI Agent 使用（Cursor、Claude Code 等）：添加 Skill 到你的 Agent
+# AI Agent 使用（OpenClaw、Cursor、Claude Code 等）：添加 Skill 到你的 Agent
 npx skills add MiniMax-AI/cli -y -g
 
 # 或全局安装 CLI 在终端中使用

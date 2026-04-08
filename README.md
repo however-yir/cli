@@ -31,7 +31,7 @@
 ## Install
 
 ```bash
-# For AI agents (Cursor, Claude Code, etc.): add skill to your agent
+# For AI agents (OpenClaw, Cursor, Claude Code, etc.): add skill to your agent
 npx skills add MiniMax-AI/cli -y -g
 
 # Or install CLI globally for terminal use
