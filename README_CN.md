@@ -26,6 +26,8 @@
 - **网络搜索** — MiniMax 搜索引擎
 - **双区域** — 国际版（`api.minimax.io`）和国内版（`api.minimaxi.com`）自动切换
 
+<img src="https://file.cdn.minimax.io/public/MMX-CLI.png" alt="MiniMax" width="100%" />
+
 ## 安装
 
 ```bash
