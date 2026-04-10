@@ -204,10 +204,16 @@ export interface MusicRequest {
   model: string;
   prompt?: string;
   lyrics?: string;
+  is_instrumental?: boolean;
+  lyrics_optimizer?: boolean;
+  audio_url?: string;
+  audio_base64?: string;
+  seed?: number;
   audio_setting?: {
     format?: string;
     sample_rate?: number;
     bitrate?: number;
+    channel?: number;
   };
   output_format?: 'url' | 'hex';
   stream?: boolean;

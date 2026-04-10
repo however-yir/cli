@@ -21,7 +21,7 @@
 - **Image** — Text-to-image with aspect ratio and batch controls
 - **Video** — Async video generation with progress tracking
 - **Speech** — TTS with 30+ voices, speed control, streaming playback
-- **Music** — Text-to-music with optional lyrics
+- **Music** — Text-to-music with lyrics, instrumental mode, auto lyrics, and cover generation from reference audio
 - **Vision** — Image understanding and description
 - **Search** — Web search powered by MiniMax
 - **Dual Region** — Seamless Global (`api.minimax.io`) and CN (`api.minimaxi.com`) support
@@ -99,9 +99,15 @@ mmx speech voices
 ### `mmx music`
 
 ```bash
-mmx music generate --prompt "Upbeat pop" --lyrics "[verse] La da dee, sunny day"
-mmx music generate --prompt "Jazz" --lyrics "La la la" --out song.mp3
+# Generate with lyrics
+mmx music generate --prompt "Upbeat pop" --lyrics "[verse] La da dee, sunny day" --out song.mp3
+# Auto-generate lyrics from prompt
+mmx music generate --prompt "Indie folk, melancholic, rainy night" --lyrics-optimizer --out song.mp3
+# Instrumental (no vocals)
 mmx music generate --prompt "Cinematic orchestral" --instrumental --out bgm.mp3
+# Cover — generate a cover version from a reference audio file
+mmx music cover --prompt "Jazz, piano, warm female vocal" --audio-file original.mp3 --out cover.mp3
+mmx music cover --prompt "Indie folk" --audio https://example.com/song.mp3 --out cover.mp3
 ```
 
 ### `mmx vision`

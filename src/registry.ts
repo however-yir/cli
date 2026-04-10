@@ -14,6 +14,7 @@ import videoGenerate from './commands/video/generate';
 import videoTaskGet from './commands/video/task-get';
 import videoDownload from './commands/video/download';
 import musicGenerate from './commands/music/generate';
+import musicCover from './commands/music/cover';
 import searchQuery from './commands/search/query';
 import visionDescribe from './commands/vision/describe';
 import quotaShow from './commands/quota/show';
@@ -189,7 +190,7 @@ ${b('Resources:')}
   ${a('speech')}     ${d('Speech synthesis (synthesize, voices)')}
   ${a('image')}      ${d('Image generation (generate)')}
   ${a('video')}      ${d('Video generation (generate, task get, download)')}
-  ${a('music')}      ${d('Music generation (generate)')}
+  ${a('music')}      ${d('Music generation (generate, cover)')}
   ${a('search')}     ${d('Web search (query)')}
   ${a('vision')}     ${d('Image understanding (describe)')}
   ${a('quota')}      ${d('Usage quotas (show)')}
@@ -269,6 +270,7 @@ export const registry = new CommandRegistry({
   'video task get':    videoTaskGet,
   'video download':    videoDownload,
   'music generate':    musicGenerate,
+  'music cover':       musicCover,
   'search query':      searchQuery,
   'vision describe':   visionDescribe,
   'quota show':       quotaShow,

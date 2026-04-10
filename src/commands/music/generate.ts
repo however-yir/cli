@@ -9,15 +9,18 @@ import { readTextFromPathOrStdin } from '../../utils/fs';
 import type { Config } from '../../config/schema';
 import type { GlobalFlags } from '../../types/flags';
 import type { MusicRequest, MusicResponse } from '../../types/api';
+import { musicGenerateModel } from './models';
 
 export default defineCommand({
   name: 'music generate',
-  description: 'Generate a song (music-2.5)',
-  usage: 'mmx music generate --prompt <text> (--lyrics <text> | --instrumental) [--out <path>] [flags]',
+  description: 'Generate a song (music-2.6-free)',
+  usage: 'mmx music generate --prompt <text> (--lyrics <text> | --instrumental | --lyrics-optimizer) [--out <path>] [flags]',
   options: [
     { flag: '--prompt <text>', description: 'Music style description (can be detailed — see examples)' },
-    { flag: '--lyrics <text>', description: 'Song lyrics with structure tags. Use "无歌词" for instrumental music. Cannot be used with --instrumental.' },
-    { flag: '--lyrics-file <path>', description: 'Read lyrics from file. Use "无歌词" for instrumental. (use - for stdin)' },
+    { flag: '--lyrics <text>', description: 'Song lyrics with structure tags. Required unless --instrumental or --lyrics-optimizer is used.' },
+    { flag: '--lyrics-file <path>', description: 'Read lyrics from file (use - for stdin)' },
+    { flag: '--lyrics-optimizer', description: 'Auto-generate lyrics from prompt (cannot be used with --lyrics or --instrumental)' },
+    { flag: '--instrumental', description: 'Generate instrumental music (no vocals). Cannot be used with --lyrics.' },
     { flag: '--vocals <text>', description: 'Vocal style, e.g. "warm male baritone", "bright female soprano", "duet with harmonies"' },
     { flag: '--genre <text>', description: 'Music genre, e.g. folk, pop, jazz' },
     { flag: '--mood <text>', description: 'Mood or emotion, e.g. warm, melancholic, uplifting' },
@@ -30,7 +33,6 @@ export default defineCommand({
     { flag: '--structure <text>', description: 'Song structure, e.g. "verse-chorus-verse-bridge-chorus"' },
     { flag: '--references <text>', description: 'Reference tracks or artists, e.g. "similar to Ed Sheeran, Taylor Swift"' },
     { flag: '--extra <text>', description: 'Additional fine-grained requirements not covered above' },
-    { flag: '--instrumental', description: 'Generate instrumental music (no vocals)' },
     { flag: '--aigc-watermark', description: 'Embed AI-generated content watermark in audio for content provenance' },
     { flag: '--format <fmt>', description: 'Audio format (default: mp3)' },
     { flag: '--sample-rate <hz>', description: 'Sample rate (default: 44100)', type: 'number' },
@@ -41,34 +43,56 @@ export default defineCommand({
   examples: [
     'mmx music generate --prompt "Upbeat pop" --lyrics "La la la..." --out summer.mp3',
     'mmx music generate --prompt "Indie folk, melancholic" --lyrics-file song.txt --out my_song.mp3',
-    '# Detailed prompt with vocal characteristics — music-2.5 responds well to rich descriptions:',
-    'mmx music generate --prompt "Warm morning folk" --vocals "male and female duet, harmonies in chorus" --instruments "acoustic guitar, piano" --bpm 95 --lyrics-file song.txt --out duet.mp3',
-    '# Instrumental (use --instrumental flag):',
+    '# Auto-generate lyrics from prompt:',
+    'mmx music generate --prompt "Upbeat pop about summer" --lyrics-optimizer --out summer.mp3',
+    '# Instrumental:',
     'mmx music generate --prompt "Cinematic orchestral, building tension" --instrumental --out bgm.mp3',
-    '# Or specify "无歌词" in lyrics:',
-    'mmx music generate --prompt "Cinematic orchestral" --lyrics "无歌词" --out bgm.mp3',
+    '# Detailed prompt with vocal characteristics:',
+    'mmx music generate --prompt "Warm morning folk" --vocals "male and female duet, harmonies in chorus" --instruments "acoustic guitar, piano" --bpm 95 --lyrics-file song.txt --out duet.mp3',
   ],
   async run(config: Config, flags: GlobalFlags) {
     let prompt = flags.prompt as string | undefined;
     let lyrics = flags.lyrics as string | undefined;
+    const isInstrumental = flags.instrumental === true;
+    const lyricsOptimizer = flags.lyricsOptimizer === true;
 
     if (flags.lyricsFile) {
       lyrics = readTextFromPathOrStdin(flags.lyricsFile as string);
     }
 
-    // Check for conflicting flags: --instrumental and --lyrics/--lyrics-file
-    if (flags.instrumental && (lyrics || flags.lyricsFile)) {
+    if (isInstrumental && lyrics) {
       throw new CLIError(
-        'Cannot use --instrumental with --lyrics or --lyrics-file. For instrumental music, simply use --instrumental without --lyrics.',
+        'Cannot use --instrumental with --lyrics or --lyrics-file.',
         ExitCode.USAGE,
         'mmx music generate --prompt <style> --instrumental',
       );
     }
 
+    if (lyricsOptimizer && (lyrics || isInstrumental)) {
+      throw new CLIError(
+        'Cannot use --lyrics-optimizer with --lyrics, --lyrics-file, or --instrumental.',
+        ExitCode.USAGE,
+        'mmx music generate --prompt <text> --lyrics-optimizer',
+      );
+    }
+
+    if (!prompt && !lyrics && !isInstrumental && !lyricsOptimizer) {
+      throw new CLIError(
+        'At least one of --prompt or --lyrics is required.',
+        ExitCode.USAGE,
+        'mmx music generate --prompt <text> --lyrics <text>',
+      );
+    }
+
+    if (!isInstrumental && !lyricsOptimizer && !lyrics?.trim()) {
+      throw new CLIError(
+        'Lyrics are required. Add --lyrics or --lyrics-file, or use --instrumental for pure music, or --lyrics-optimizer to auto-generate.',
+        ExitCode.USAGE,
+        'mmx music generate --prompt <text> --lyrics <text>',
+      );
+    }
+
     // Build structured prompt from optional music characteristic flags.
-    // music-2.5 interprets rich natural-language prompts — these flags make it
-    // easy to describe vocal style, genre, mood, and instrumentation without
-    // needing to hand-craft a long --prompt string.
     const structuredParts: string[] = [];
     if (flags.vocals)      structuredParts.push(`Vocals: ${flags.vocals as string}`);
     if (flags.genre)       structuredParts.push(`Genre: ${flags.genre as string}`);
@@ -83,35 +107,6 @@ export default defineCommand({
     if (flags.references)  structuredParts.push(`References: ${flags.references as string}`);
     if (flags.extra)       structuredParts.push(`Extra: ${flags.extra as string}`);
 
-    // Handle "无歌词" as instrumental request
-    if (lyrics === '无歌词' || lyrics === 'no lyrics') {
-      lyrics = '[intro] [outro]';
-      structuredParts.push('Style: instrumental, no vocals, pure music');
-    }
-
-    // Handle --instrumental: music-2.5 has no is_instrumental flag,
-    // so we use the empty-structure lyrics workaround.
-    if (flags.instrumental) {
-      lyrics = '[intro] [outro]';
-      structuredParts.push('Style: instrumental, no vocals, pure music');
-    }
-
-    if (!prompt && !lyrics) {
-      throw new CLIError(
-        'At least one of --prompt or --lyrics is required.',
-        ExitCode.USAGE,
-        'mmx music generate --prompt <text> --lyrics <text>',
-      );
-    }
-
-    if (!lyrics?.trim()) {
-      throw new CLIError(
-        'The API requires lyrics. Add --lyrics or --lyrics-file, or use --instrumental (or --lyrics "无歌词") for instrumental output.',
-        ExitCode.USAGE,
-        'mmx music generate --prompt <text> --lyrics <text>',
-      );
-    }
-
     if (structuredParts.length > 0) {
       const structured = structuredParts.join('. ');
       prompt = prompt ? `${prompt}. ${structured}` : structured;
@@ -120,25 +115,25 @@ export default defineCommand({
     const ts = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
     const ext = (flags.format as string) || 'mp3';
     const outPath = (flags.out as string | undefined) ?? `music_${ts}.${ext}`;
-    const outFormat = 'hex';
     const format = detectOutputFormat(config.output);
 
+    const model = musicGenerateModel(config);
     const body: MusicRequest = {
-      model: 'music-2.5',
+      model,
       prompt,
       lyrics,
+      is_instrumental: isInstrumental || undefined,
+      lyrics_optimizer: lyricsOptimizer || undefined,
       audio_setting: {
         format: (flags.format as string) || 'mp3',
         sample_rate: (flags.sampleRate as number) ?? 44100,
         bitrate: (flags.bitrate as number) ?? 256000,
       },
-      output_format: outFormat,
+      output_format: 'hex',
       stream: flags.stream === true,
     };
 
-    if (flags.aigcWatermark) {
-      body.aigc_watermark = true;
-    }
+    if (flags.aigcWatermark) body.aigc_watermark = true;
 
     if (config.dryRun) {
       console.log(formatOutput({ request: body }, format));
@@ -166,7 +161,7 @@ export default defineCommand({
       body,
     });
 
-    if (!config.quiet) process.stderr.write('[Model: music-2.5]\n');
+    if (!config.quiet) process.stderr.write(`[Model: ${model}]\n`);
     saveAudioOutput(response, outPath, format, config.quiet);
   },
 });
