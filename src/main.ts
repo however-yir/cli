@@ -2,9 +2,9 @@ import { scanCommandPath, parseFlags } from './args';
 import { registry } from './registry';
 import { GLOBAL_OPTIONS } from './command';
 import { handleError } from './errors/handler';
-import { loadConfig } from './config/loader';
+import { loadConfig, readConfigFile } from './config/loader';
 import { detectRegion, saveDetectedRegion } from './config/detect-region';
-import { REGIONS } from './config/schema';
+import { REGIONS, type Region } from './config/schema';
 import { checkForUpdate, getPendingUpdateNotification } from './update/checker';
 import { loadCredentials } from './auth/credentials';
 import { ensureApiKey } from './auth/setup';
@@ -44,7 +44,9 @@ async function main() {
   const commandPath = scanCommandPath(argv, GLOBAL_OPTIONS);
 
   if (argv.includes('--help') || argv.includes('-h')) {
-    registry.printHelp(commandPath, process.stderr);
+    const ri = argv.indexOf('--region');
+    const region = ((ri >= 0 && argv[ri + 1]) || process.env.MINIMAX_REGION || readConfigFile().region || 'global') as Region;
+    registry.printHelp(commandPath, process.stderr, region);
     process.exit(0);
   }
 

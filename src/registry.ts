@@ -1,6 +1,7 @@
 import type { Command } from './command';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
+import { DOCS_HOSTS, type Region } from './config/schema';
 
 import authLogin from './commands/auth/login';
 import authStatus from './commands/auth/status';
@@ -119,7 +120,7 @@ class CommandRegistry {
   private accent = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[38;2;248;103;58m${s}\x1b[0m` : s;
   private dim   = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[2m${s}\x1b[0m` : s;
 
-  printHelp(commandPath: string[], out: NodeJS.WriteStream = process.stdout): void {
+  printHelp(commandPath: string[], out: NodeJS.WriteStream = process.stdout, region: Region = 'global'): void {
     if (commandPath.length === 0) {
       this.printRootHelp(out);
       return;
@@ -136,7 +137,7 @@ class CommandRegistry {
     }
 
     if (node.command) {
-      this.printCommandHelp(node.command, out);
+      this.printCommandHelp(node.command, out, region);
       return;
     }
 
@@ -217,7 +218,7 @@ ${b('Getting Help:')}
 `);
   }
 
-  private printCommandHelp(cmd: Command, out: NodeJS.WriteStream): void {
+  private printCommandHelp(cmd: Command, out: NodeJS.WriteStream, region: Region = 'global'): void {
     const b = (s: string) => this.bold(s, out);
     const a = (s: string) => this.accent(s, out);
     const d = (s: string) => this.dim(s, out);
@@ -236,6 +237,9 @@ ${b('Getting Help:')}
       for (const ex of cmd.examples) {
         out.write(`  ${d(ex)}\n`);
       }
+    }
+    if (cmd.apiDocs) {
+      out.write(`\n${b('API Reference:')} ${d(DOCS_HOSTS[region] + cmd.apiDocs)}\n`);
     }
     out.write(`\n${d('Global flags (--api-key, --output, --quiet, etc.) are always available.')}\n`);
     out.write(`${d("Run")} mmx --help ${d('for the full list.')}\n`);

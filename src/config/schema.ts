@@ -3,6 +3,11 @@ export const REGIONS = {
   cn: 'https://api.minimaxi.com',
 } as const;
 
+export const DOCS_HOSTS = {
+  global: 'https://platform.minimax.io',
+  cn: 'https://platform.minimaxi.com',
+} as const;
+
 export type Region = keyof typeof REGIONS;
 
 export interface ConfigFile {
